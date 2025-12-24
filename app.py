@@ -371,7 +371,7 @@ else:
 # 页脚
 st.markdown("---")
 st.markdown(
-    '<p style="text-align: center; color: #94a3b8; font-size: 0.85rem;">高校统战部新闻爬取工具 MVP v1.0</p>',
+    '<p style="text-align: center; color: #94a3b8; font-size: 0.85rem;">高校统战部新闻爬取工具 v1.0</p>',
     unsafe_allow_html=True
 )
 
