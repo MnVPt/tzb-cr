@@ -399,10 +399,13 @@ def parse_shsy(html: str, base_url: str) -> List[Dict]:
                     msg_url = item.get("messageurl", "").strip()
                     
                     # 构建完整URL
+                    # 注意：详情页URL的正确格式是 https://www.shsy.org.cn/detailpage/xxx.html
                     if msg_url.startswith("http"):
                         url = msg_url
+                    elif msg_url.startswith("detailpage/"):
+                        url = "https://www.shsy.org.cn/" + msg_url
                     elif msg_url:
-                        url = urljoin("https://www.shsy.org.cn/node933/shsy/tzll/gzdt/", msg_url)
+                        url = urljoin("https://www.shsy.org.cn/", msg_url)
                     else:
                         continue
                     
