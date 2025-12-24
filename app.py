@@ -288,8 +288,8 @@ if st.session_state.fetched:
         """
         
         # 使用 components.html 渲染可点击的表格
-        # 计算表格高度：每行约50px + 表头60px + padding
-        table_height = min(len(news) * 50 + 100, 800)
+        # 计算表格高度：每行约45px + 表头60px，最大2000px确保能显示更多内容
+        table_height = min(len(news) * 45 + 80, 2000)
         
         full_html = f"""
         <html>
