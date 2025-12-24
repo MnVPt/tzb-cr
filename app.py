@@ -4,7 +4,54 @@
 
 import streamlit as st
 import streamlit.components.v1 as components
+import pandas as pd
+from io import BytesIO
+from datetime import datetime
 from scrapers import scrape_all_universities, UNIVERSITIES
+
+
+def convert_to_excel(news_list):
+    """将新闻列表转换为Excel文件"""
+    df = pd.DataFrame(news_list)
+    # 重命名列
+    df = df.rename(columns={
+        "source": "来源",
+        "title": "新闻标题",
+        "date": "发布日期",
+        "url": "原文链接"
+    })
+    # 调整列顺序
+    df = df[["来源", "新闻标题", "发布日期", "原文链接"]]
+    
+    # 创建Excel文件
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='统战新闻')
+        
+        # 获取工作表
+        workbook = writer.book
+        worksheet = writer.sheets['统战新闻']
+        
+        # 设置列宽
+        worksheet.set_column('A:A', 18)  # 来源
+        worksheet.set_column('B:B', 60)  # 新闻标题
+        worksheet.set_column('C:C', 12)  # 发布日期
+        worksheet.set_column('D:D', 50)  # 原文链接
+        
+        # 设置表头格式
+        header_format = workbook.add_format({
+            'bold': True,
+            'bg_color': '#1e3a5f',
+            'font_color': 'white',
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1
+        })
+        
+        for col_num, value in enumerate(df.columns.values):
+            worksheet.write(0, col_num, value, header_format)
+    
+    return output.getvalue()
 
 # 页面配置
 st.set_page_config(
@@ -183,6 +230,19 @@ if st.session_state.fetched:
             </div>
         </div>
         """, unsafe_allow_html=True)
+        
+        # 下载按钮
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col2:
+            excel_data = convert_to_excel(news)
+            filename = f"统战新闻_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            st.download_button(
+                label="📥 导出Excel文件",
+                data=excel_data,
+                file_name=filename,
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
         
         # 构建新闻表格HTML
         def get_source_class(source):
